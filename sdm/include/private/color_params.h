@@ -59,6 +59,7 @@ enum PendingAction {
   kDisableFrameCapture = BITMAP(7),
   kConfigureDetailedEnhancer = BITMAP(8),
   kInvalidatingAndkSetPanelBrightness = BITMAP(9),
+  kModeSet = BITMAP(10),
   kGetDetailedEnhancerData = BITMAP(21),
   kNoAction = BITMAP(31),
 };
@@ -119,11 +120,12 @@ enum PPGlobalColorFeatureID {
   kGlobalColorFeatureDither,
   kGlobalColorFeatureGamut,
   kGlobalColorFeaturePADither,
+  kGlobalColorFeatureCsc,
   kMaxNumPPFeatures,
 };
 
 struct PPPendingParams {
-  PendingAction action = kNoAction;
+  int32_t action = kNoAction;
   void *params = NULL;
 };
 
@@ -329,6 +331,21 @@ struct SDEPccCfg {
 
   static SDEPccCfg *Init(uint32_t arg __attribute__((__unused__)));
   SDEPccCfg *GetConfig() { return this; }
+};
+
+struct SDECscCfg {
+  static const uint32_t kCscMVSize = 9;
+  static const uint32_t kCscBVSize = 3;
+  static const uint32_t kCscLVSize = 6;
+  uint32_t flags;
+  uint32_t csc_mv[kCscMVSize];
+  uint32_t csc_pre_bv[kCscBVSize];
+  uint32_t csc_post_bv[kCscBVSize];
+  uint32_t csc_pre_lv[kCscLVSize];
+  uint32_t csc_post_lv[kCscLVSize];
+
+  static SDECscCfg *Init(uint32_t arg __attribute__((__unused__)));
+  SDECscCfg *GetConfig() { return this; }
 };
 
 struct SDEDitherCfg {

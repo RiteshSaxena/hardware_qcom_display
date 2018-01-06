@@ -153,8 +153,10 @@ void HWCDisplayPrimary::ProcessBootAnimCompleted() {
     boot_animation_completed_ = true;
     // Applying default mode after bootanimation is finished And
     // If Data is Encrypted, it is ready for access.
-    if (display_intf_)
+    if (display_intf_) {
       display_intf_->ApplyDefaultDisplayMode();
+      RestoreColorTransform();
+    }
   }
 }
 
@@ -267,6 +269,18 @@ HWC2::Error HWCDisplayPrimary::SetColorMode(android_color_mode_t mode) {
   return status;
 }
 
+HWC2::Error HWCDisplayPrimary::RestoreColorTransform() {
+  auto status = color_mode_->RestoreColorTransform();
+  if (status != HWC2::Error::None) {
+    DLOGE("failed to RestoreColorTransform");
+    return status;
+  }
+
+  callbacks_->Refresh(HWC_DISPLAY_PRIMARY);
+
+  return status;
+}
+
 HWC2::Error HWCDisplayPrimary::SetColorTransform(const float *matrix,
                                                  android_color_transform_t hint) {
   if (!matrix) {
@@ -372,9 +386,12 @@ void HWCDisplayPrimary::SetSecureDisplay(bool secure_display_active) {
     DLOGI("SecureDisplay state changed from %d to %d Needs Flush!!", secure_display_active_,
           secure_display_active);
     secure_display_active_ = secure_display_active;
-    skip_prepare_ = true;
+
+    // Avoid flush for Command mode panel.
+    DisplayConfigFixedInfo display_config;
+    display_intf_->GetConfig(&display_config);
+    skip_prepare_ = !display_config.is_cmdmode;
   }
-  return;
 }
 
 void HWCDisplayPrimary::ForceRefreshRate(uint32_t refresh_rate) {
