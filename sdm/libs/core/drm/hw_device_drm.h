@@ -72,6 +72,7 @@ class HWDeviceDRM : public HWInterface {
   virtual DisplayError GetHWPanelInfo(HWPanelInfo *panel_info);
   virtual DisplayError SetDisplayAttributes(uint32_t index);
   virtual DisplayError SetDisplayAttributes(const HWDisplayAttributes &display_attributes);
+  virtual DisplayError SetDisplayFormat(uint32_t index, DisplayInterfaceFormat pref_fmt);
   virtual DisplayError GetConfigIndex(char *mode, uint32_t *index);
   virtual DisplayError PowerOn(const HWQosData &qos_data, int *release_fence);
   virtual DisplayError PowerOff();
@@ -129,6 +130,7 @@ class HWDeviceDRM : public HWInterface {
   void UpdateMixerAttributes();
   void SetSolidfillStages();
   void AddSolidfillStage(const HWSolidfillStage &sf, uint32_t plane_alpha);
+  void ClearSolidfillStages();
   void SetBlending(const LayerBlending &source, sde_drm::DRMBlendType *target);
   void SetSrcConfig(const LayerBuffer &input_buffer, const HWRotatorMode &mode, uint32_t *config);
   void SelectCscType(const LayerBuffer &input_buffer, sde_drm::DRMCscType *type);
